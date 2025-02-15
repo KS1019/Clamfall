@@ -1,0 +1,41 @@
+name: Clamfall
+options:
+  bundleIdPrefix: ks1019.kotaro.suto.Clamfall
+  deploymentTarget:
+      macOS: 14.0
+targets:
+  Clamfall:
+    type: application
+    platform: macOS
+    info:
+      path: Sources/Info.plist
+      properties:
+        LSUIElement: true
+    sources:
+      - Sources
+      - project.yml
+      - .gitignore
+      - .github
+      - fastlane
+      - Assets.xcassets
+    dependencies:
+      - package: LaunchAtLogin
+        product: LaunchAtLogin
+schemes:
+  App:
+    build: 
+      targets: 
+        Clamfall: all
+settings:
+  DEAD_CODE_STRIPPING: true
+  configs:
+    debug:
+      MARKETING_VERSION: 0.0.0
+      CURRENT_PROJECT_VERSION: 0
+    release:
+      MARKETING_VERSION: CI_MARKETING_VERSION
+      CURRENT_PROJECT_VERSION: CI_CURRENT_PROJECT_VERSION
+packages:
+  LaunchAtLogin:
+    url: https://github.com/sindresorhus/LaunchAtLogin-Modern
+    from: 1.1.0
