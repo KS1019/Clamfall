@@ -1,0 +1,5 @@
+# macapp-template
+```shell
+xcodegen
+```
+
