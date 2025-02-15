@@ -1,0 +1,44 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:mac)
+
+platform :mac do
+
+  desc "Bump up version"
+  lane :bump do |options|
+    Dir.chdir("..") do
+      xcodegen_project = "project.yml"
+      text = File.read(xcodegen_project)
+      text = text.gsub(/CI_MARKETING_VERSION/, options[:market_version])
+      text = text.gsub(/CI_CURRENT_PROJECT_VERSION/, options[:current_project_version])
+      File.write(xcodegen_project, text)
+    end
+  end
+
+  desc ""
+  lane :build do
+    Dir.chdir("..") do
+      sh "xcodegen"
+    end
+    gym(
+      scheme: "App",
+      configuration: "Release",
+      clean: true,
+      archive_path: "Archive.xcarchive",
+      export_method: "mac-application",
+    )
+  end
+end
