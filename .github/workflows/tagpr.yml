@@ -26,13 +26,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set Environment
-      run: sudo xcrun xcode-select -s /Applications/Xcode_15.4.app
+      run: sudo xcrun xcode-select -s /Applications/Xcode_16.2.app
     - name: Update Build Number
       env:
         TAG_NAME: ${{ needs.tagpr.outputs.tag }}
         RUN_ID: ${{ github.run_id }}
       run: |
           export CLEAN_TAG=$(echo $TAG_NAME | sed -e 's/refs\/tags\///')
+          bundle install
           bundle exec fastlane bump market_version:$CLEAN_TAG current_project_version:1.$RUN_ID
           echo "### Version for $APP_NAME" >> $GITHUB_STEP_SUMMARY
           echo "$CLEAN_TAG" >> $GITHUB_STEP_SUMMARY
