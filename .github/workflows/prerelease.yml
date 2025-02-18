@@ -10,8 +10,6 @@ jobs:
   build:
     runs-on: macos-latest
     timeout-minutes: 10
-    outputs:
-      app_name: $APP_NAME
     steps:
       - uses: actions/checkout@v4
       - name: Set Environment
@@ -42,7 +40,7 @@ jobs:
       - name: Create a new Release and Upload App
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ needs.build.outputs.app_name }}.zip
+          files: Clamfall.zip
           body: |
             Update description
             
