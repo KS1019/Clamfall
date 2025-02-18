@@ -34,6 +34,8 @@ jobs:
       run: |
           export CLEAN_TAG=$(echo $TAG_NAME | sed -e 's/refs\/tags\///')
           bundle exec fastlane bump market_version:$CLEAN_TAG current_project_version:1.$RUN_ID
+          echo "### Version for $APP_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "$CLEAN_TAG" >> $GITHUB_STEP_SUMMARY
     - name: Build
       run: bundle exec fastlane build
     - name: Create ZIPs
@@ -41,6 +43,7 @@ jobs:
         ditto -c -k --sequesterRsrc --keepParent ./Archive.xcarchive/Products/Applications/$APP_NAME.app ./$APP_NAME.zip
     - name: Get the file hash sha256 of the ZIP
       run: |
+        echo "### Hash for $APP_NAME" >> $GITHUB_STEP_SUMMARY
         shasum -a 256 $APP_NAME.zip >> $GITHUB_STEP_SUMMARY
     - name: Create a new Release and Upload App
       uses: softprops/action-gh-release@v2
