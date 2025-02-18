@@ -31,7 +31,7 @@ platform :mac do
   desc ""
   lane :build do
     Dir.chdir("..") do
-      sh "xcodegen"
+      sh "brew install xcodegen && xcodegen"
     end
     gym(
       scheme: "App",
