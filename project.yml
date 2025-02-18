@@ -18,6 +18,7 @@ targets:
       - .github
       - fastlane
       - Assets.xcassets
+      - .tagpr
     dependencies:
       - package: LaunchAtLogin
         product: LaunchAtLogin
