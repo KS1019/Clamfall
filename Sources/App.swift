@@ -1,10 +1,12 @@
 import SwiftUI
 import LaunchAtLogin
 import OSLog
+import Observation
 
 @main
 struct Clamfall: App {
     @Environment(\.openWindow) var openWindow
+    @State var isMachineAwake = true
 
     init() {
         Logger(.system).trace("init")
@@ -36,15 +38,34 @@ struct Clamfall: App {
     }
 
     func observe() {
+        let notificationCenter = NSWorkspace.shared.notificationCenter
+        let willSleepNotification = notificationCenter.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { _ in
+            isMachineAwake = false
+        }
+        let didWakeNotification = notificationCenter.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { _ in
+            isMachineAwake = true
+        }
+
+        defer {
+            notificationCenter.removeObserver(willSleepNotification)
+            notificationCenter.removeObserver(didWakeNotification)
+        }
+
         Task {
-            if isLidClosed() {
-                Logger(.app).trace("Lid is closed. Trying to sleep machine")
-                sleepMachine()
+            while true {
+                if isMachineAwake {
+                    if isLidClosed() {
+                        Logger(.app).trace("Lid is closed. Trying to sleep machine")
+                        sleepMachine()
+                        try await Task.sleep(for: .seconds(60))
+                    }
+                    Logger(.app).trace("Will Task.sleep")
+                    try await Task.sleep(for: .seconds(2))
+                    Logger(.app).trace("Recursively call observe")
+                } else {
+                    Logger(.system).debug("Machine is not awake")
+                }
             }
-            Logger(.app).trace("Will Task.sleep")
-            try await Task.sleep(for: .seconds(2))
-            Logger(.app).trace("Recursively call observe")
-            observe()
         }
     }
 
@@ -58,7 +79,7 @@ struct Clamfall: App {
         let fileHandle = pipe.fileHandleForReading
         do {
             try process.run()
-            if (String(data: fileHandle.readDataToEndOfFile(), encoding: .utf8)?.contains("Yes") ?? false) {
+            if String(data: fileHandle.readDataToEndOfFile(), encoding: .utf8)?.contains("Yes") ?? false {
                 return true
             }
         } catch {
@@ -69,13 +90,14 @@ struct Clamfall: App {
     }
 
     func sleepMachine() {
-        Logger(.app).debug("Sleeping Machine")
+        Logger(.app).debug("==============================\nSleeping Machine")
         do {
             // Ref: https://stackoverflow.com/a/77070339
             try Process.run(URL(fileURLWithPath: "/usr/bin/pmset"), arguments: ["sleepnow"])
         } catch {
             Logger(.system).error("pmset failed. Reason: \(error, privacy: .public)")
         }
+        Logger(.app).debug("==============================")
     }
 
     var settingsWindow: some Scene {
@@ -114,13 +136,13 @@ struct Clamfall: App {
                 Section("LaunchAtLogin-Modern") {
                     Text("""
                     MIT License
-                    
+
                     Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
-                    
+
                     Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-                    
+
                     The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-                    
+
                     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                     """)
                 }
