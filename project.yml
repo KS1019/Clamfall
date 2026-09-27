@@ -1,6 +1,7 @@
 name: Clamfall
 options:
   bundleIdPrefix: ks1019.kotaro.suto.Clamfall
+  developmentLanguage: en
   deploymentTarget:
       macOS: 14.0
 targets:
@@ -29,6 +30,8 @@ schemes:
         Clamfall: all
 settings:
   DEAD_CODE_STRIPPING: true
+  LOCALIZATION_PREFERS_STRING_CATALOGS: true
+  SWIFT_EMIT_LOC_STRINGS: true
   configs:
     debug:
       MARKETING_VERSION: 0.0.0
