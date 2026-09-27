@@ -16,11 +16,11 @@ struct Clamfall: App {
 
     var body: some Scene {
         MenuBarExtra("", systemImage: "gear") {
-            Button("設定") {
+            Button("Settings") {
                 openWindow(id: "settings")
             }
             Divider()
-            Button("再起動") {
+            Button("Restart") {
                 let url = URL(fileURLWithPath: Bundle.main.resourcePath!)
                 let path = url.deletingLastPathComponent().deletingLastPathComponent().absoluteString
                 let task = Process()
@@ -29,7 +29,7 @@ struct Clamfall: App {
                 try! task.run()
                 NSApplication.shared.terminate(self)
             }
-            Button("終了") {
+            Button("Quit") {
                 NSApplication.shared.terminate(nil)
             }
         }
@@ -101,22 +101,22 @@ struct Clamfall: App {
     }
 
     var settingsWindow: some Scene {
-        Window("設定", id: "settings") {
+        Window("Settings", id: "settings") {
             @Environment(\.openWindow) var openWindow
             Form {
-                Section("設定") {
+                Section("Settings") {
                     HStack {
-                        LaunchAtLogin.Toggle("ログイン時に起動")
+                        LaunchAtLogin.Toggle("Launch at Login")
                             .toggleStyle(.switch)
                     }
                     HStack {
-                        Text("Ver ") + Text((Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "?.?.?")
+                        Text("Ver ") + Text(verbatim: (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "?.?.?")
                     }
                     HStack {
-                        Link("Webサイト", destination: URL(string: "https://github.com/KS1019/Clamfall")!)
+                        Link("Website", destination: URL(string: "https://github.com/KS1019/Clamfall")!)
                     }
                     HStack {
-                        Button("ライセンス") {
+                        Button("Licenses") {
                             openWindow(id: "licenses")
                         }
                     }
@@ -131,10 +131,10 @@ struct Clamfall: App {
     }
 
     var licensesWindow: some Scene {
-        Window("ライセンス", id: "licenses") {
+        Window("Licenses", id: "licenses") {
             Form {
-                Section("LaunchAtLogin-Modern") {
-                    Text("""
+                Section {
+                    Text(verbatim: """
                     MIT License
 
                     Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)
@@ -145,6 +145,8 @@ struct Clamfall: App {
 
                     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                     """)
+                } header: {
+                    Text(verbatim: "LaunchAtLogin-Modern")
                 }
             }
             .formStyle(.grouped)
